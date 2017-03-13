@@ -27,11 +27,5 @@ $docker-compose up
 in the directory where docker-compose.yml files is located.
 It will take long time first time to stat up as lots of docker images will be downloaded.
 After all the messages stop scrolling on the console, just point your browser to localhost:3000
-default login "dittest@ualberta.ca" password "secret1234"
-
-      admin = User.new({
-                  :email => "dittest@ualberta.ca",
-                  :password => "secret1234",
-                  }) unless User.find_by_user_key("dittest@ualberta.ca")
 
 
