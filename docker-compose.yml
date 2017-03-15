@@ -51,26 +51,6 @@ services:
     networks:
       internal:
 
-# solr:
-#    extends: app
-#    command: /usr/local/bin/start_solr.sh
-#    expose:
-#      - 8983
-#    volumes:
-#      - solr:/solr
-#    ports:
-#      - 9000:8983
-#
-#  fedora:
-#    extends: app
-#    command: /usr/local/bin/start_fedora.sh
-#    expose:
-#      - 8984
-#    ports:
-#      - 9001:8984
-#    volumes:
-#      - fcrepo:/fedora
-
   web:
     extends: app
     command: /usr/local/bin/start_hyku.sh
@@ -79,7 +59,6 @@ services:
     depends_on:
       - db
       - redis
-      - setup
     volumes:
       - app:/data/public/uploads
     ports:
@@ -95,9 +74,10 @@ services:
       - RDS_PASSWORD=''
       - RDS_HOSTNAME=db
       - RDS_PORT=5432
-    command: /bin/bash -c "if [ ! -e /db/initialized ]; then sleep 15 && /data/bin/setup && touch /db/initialized; fi"
+    command: /bin/bash -c "if [ ! -e /db/initialized ]; then sleep 25 && /data/bin/setup && touch /db/initialized; fi"
     volumes:
       - db:/db
     depends_on:
       - db
+      - web
 
