@@ -1,0 +1,28 @@
+version: '2.1'
+
+volumes:
+  db:
+
+services:
+
+  db:
+    image: postgres
+    healthcheck:
+      test: pg_isready -h localhost -p 5432 -q -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 100
+
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  setup:
+    image: ualibraries/hyku_app
+    env_file: .env
+    command: /bin/bash -c "if [ ! -e /db/initialized ]; then sleep 25 && /data/bin/setup && touch /db/initialized; fi"
+    volumes:
+      - db:/db
+    depends_on:
+      db:
+        condition: service_healthy
+

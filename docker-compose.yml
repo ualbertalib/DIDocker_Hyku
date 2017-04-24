@@ -1,83 +1,65 @@
-version: '2'
+version: '2.1'
 
 volumes:
-  fcrepo:
+  fedora:
   solr:
   db:
   redis:
   app:
 
-networks:
-   internal:
-
 services:
 
   db:
     image: postgres
-    environment:
-      - POSTGRES_DB=development
-    expose:
-      - 5432
+    healthcheck:
+      test: pg_isready -h localhost -p 5432 -q -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 100
+
     volumes:
       - db:/var/lib/postgresql/data
-    networks:
-      internal:
 
   redis:
     image: redis:3
     command: redis-server
     volumes:
       - redis:/data
-    expose:
-      - 6379
-    networks:
-      internal:
-    ports:
-      - 6379:6379
+#    ports:
+#      - 6379:6379
 
-  app:
-    image: ualibraries/hyku_app
+  solr:
+    image: ualibraries/solr_hydra
+    command: /usr/local/bin/start_solr.sh
     environment:
-      - REDIS_HOST=redis
-      - DATABASE_URL=postgresql://postgres@db/development
-      - SETTINGS__ACTIVE_JOB__QUEUE_ADAPTER=sidekiq
-      - RAILS_ENV=development
-      - RAILS_SERVE_STATIC_FILES=true
-      - RAILS_LOG_TO_STDOUT=true
-      - SECRET_KEY_BASE=asdf
+      - SOLR_CORE=production
     volumes:
-      - solr:/solr
-      - fcrepo:/fedora
-    networks:
-      internal:
+      - solr:/opt/solr/server/solr
+#    ports:
+#      - 8983:8983
+
+  fedora:
+    image: ualibraries/fedora
+    volumes:
+      - fedora:/fedora
+#    ports:
+#      - 8080:8080
 
   web:
-    extends: app
+    image: ualibraries/hyku_app
     command: /usr/local/bin/start_hyku.sh
-    expose:
-      - 3000
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - SETTINGS__ACTIVE_JOB__QUEUE_ADAPTER=sidekiq
+      - FEDORA_URL=http://fedora:8080/fcrepo/rest
+      - SOLR_URL=http://solr:8983/solr/hydra-production
+      - RAILS_SERVE_STATIC_FILES=true
+      - RAILS_LOG_TO_STDOUT=true
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+    ports:
+      - ${HOSTPORT}:3000
     volumes:
       - app:/data/public/uploads
-    ports:
-      - 3000:3000
-      - 8983:8983
-      - 8984:8984
-
-  setup:
-    extends: app
-    environment:
-      - RDS_DB_NAME=development
-      - RDS_USERNAME=postgres
-      - RDS_PASSWORD=''
-      - RDS_HOSTNAME=db
-      - RDS_PORT=5432
-    command: /bin/bash -c "if [ ! -e /db/initialized ]; then sleep 25 && /data/bin/setup && touch /db/initialized; fi"
-    volumes:
-      - db:/db
-    depends_on:
-      - db
-      - web
-

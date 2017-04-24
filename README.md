@@ -20,6 +20,26 @@ if you do not wish to expose those ports please comment/remove following lines f
       - 8983:8983
       - 8984:8984
 
+
+
+Inspecting Sor and Fedora:
+--------------------------
+
+Edit docker-compose.yml file and uncoment lines that exposes solr and fedora ports:
+
+- for Solr
+```
+#    ports:
+#      - 8983:8983
+```
+
+- for Fedora
+```
+#    ports:
+#      - 8080:8080
+```
+
+
 Now just run:
 
 $docker-compose up
