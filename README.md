@@ -13,6 +13,14 @@ seed it with data.
      ```shell
      git clone https://github.com/ualbertalib/didocker_hyku.git
      ```
+  4. Optional: clone Hydra-in-a-Box repository and build Hyku docker image
+     (if you choose to skip this step you can always pull ualibraries/hyku
+     image from [dockerhub](https://hub.docker.com/r/ualibraries/hyku) )
+     ```shell
+     cd [directory where you cloned didocker_hyku]
+     git clone https://github.com/projecthydra-labs/hyku.git
+     docker build . -t ualibraries/hyku
+     ```
   5. Pull all necessary images
      ```shell
      docker-compose pull

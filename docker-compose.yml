@@ -9,6 +9,7 @@ volumes:
 
 services:
 
+# this is postgress database image
   db:
     image: postgres
     healthcheck:
@@ -20,6 +21,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
+# REDIS in memory database
   redis:
     image: redis:3
     command: redis-server
@@ -27,7 +29,8 @@ services:
       - redis:/data
 #    ports:
 #      - 6379:6379
-
+#
+# SOLR indexing
   solr:
     image: ualibraries/solr_hydra
     command: /usr/local/bin/start_solr.sh
@@ -38,6 +41,7 @@ services:
 #    ports:
 #      - 8983:8983
 
+# Fedora object store
   fedora:
     image: ualibraries/fedora
     volumes:
@@ -45,6 +49,7 @@ services:
 #    ports:
 #      - 8080:8080
 
+# This image actually runs hyku app
   web:
     image: ualibraries/hyku_app
     command: /usr/local/bin/start_hyku.sh
