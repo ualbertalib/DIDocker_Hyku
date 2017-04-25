@@ -15,11 +15,11 @@ seed it with data.
      ```
   4. Optional: clone Hydra-in-a-Box repository and build Hyku docker image
      (if you choose to skip this step you can always pull ualibraries/hyku
-     image from [dockerhub](https://hub.docker.com/r/ualibraries/hyku) )
+     image from [dockerhub](https://hub.docker.com/r/ualibraries/hyku_app) )
      ```shell
      cd [directory where you cloned didocker_hyku]
      git clone https://github.com/projecthydra-labs/hyku.git
-     docker build . -t ualibraries/hyku
+     docker build . -t ualibraries/hyku_app
      ```
   5. Pull all necessary images
      ```shell
