@@ -5,8 +5,7 @@ RUN apt-get update -qq && \
                        libreoffice-core \
                        libreoffice-base-core \
                        libreoffice-common \
-                       imagemagick\
-                       unzip && \
+                       imagemagick &&\
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /data
