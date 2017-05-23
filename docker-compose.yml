@@ -65,6 +65,6 @@ services:
       db:
         condition: service_healthy
     ports:
-      - ${HOSTPORT}:3000
+      - ${HOSTPORT}:9292
     volumes:
       - app:/data/public/uploads

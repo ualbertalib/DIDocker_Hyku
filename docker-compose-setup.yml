@@ -2,6 +2,8 @@ version: '2.1'
 
 volumes:
   db:
+  fedora:
+  solr:
 
 services:
 
@@ -12,17 +14,39 @@ services:
       interval: 5s
       timeout: 5s
       retries: 100
-
     volumes:
       - db:/var/lib/postgresql/data
+
+# SOLR indexing
+  solr:
+    image: ualibraries/solr_hydra
+    command: /usr/local/bin/start_solr.sh
+    environment:
+      - SOLR_CORE=production
+    volumes:
+      - solr:/opt/solr/server/solr
+
+# Fedora object store
+  fedora:
+    image: ualibraries/fedora
+    volumes:
+      - fedora:/fedora
 
   setup:
     image: ualibraries/hyku_app
     env_file: .env
+    environment:
+      - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
+      - FEDORA_URL=http://fedora:8080/fcrepo/rest
+      - SOLR_URL=http://solr:8983/solr/hydra-production
+    volumes:
     command: /bin/bash -c "if [ ! -e /db/initialized ]; then sleep 25 && /data/bin/setup && touch /db/initialized; fi"
     volumes:
       - db:/db
     depends_on:
       db:
-        condition: service_healthy
+          condition: service_healthy
+    depends_on:
+      - fedora
+      - solr
 

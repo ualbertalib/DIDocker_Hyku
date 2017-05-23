@@ -1,4 +1,4 @@
-FROM ualibraries/ruby_plus2.3.3
+FROM ualibraries/rubyhydra
 RUN apt-get update -qq && \
     apt-get install -y libpq-dev \
                        nodejs \
@@ -15,7 +15,6 @@ RUN bundle install
 RUN bundle exec rake assets:precompile
 ADD files/start_hyku.sh /usr/local/bin
 ADD files/production.yml /data/config/settings
-#ADD files/database.yml /data/config
 
 EXPOSE 3000
 
