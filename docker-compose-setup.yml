@@ -19,12 +19,15 @@ services:
 
 # SOLR indexing
   solr:
-    image: ualibraries/solr_hydra
-    command: /usr/local/bin/start_solr.sh
-    environment:
-      - SOLR_CORE=production
+    image: solr
     volumes:
       - solr:/opt/solr/server/solr
+      - ./solr_config:/config
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - hydra-production
+      - /config
 
 # Fedora object store
   fedora:

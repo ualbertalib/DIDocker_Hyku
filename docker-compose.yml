@@ -32,11 +32,7 @@ services:
 #
 # SOLR indexing
   solr:
-    #image: ualibraries/solr_hydra
     image: solr
-    #command: /usr/local/bin/start_solr.sh
-    #environment:
-    #  - SOLR_CORE=production
     volumes:
       - solr:/opt/solr/server/solr
       - ./solr_config:/config
