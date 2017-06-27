@@ -1,15 +1,12 @@
 version: '2.1'
 
 volumes:
+  db:
   fedora:
   solr:
-  db:
-  redis:
-  app:
 
 services:
 
-# this is postgress database image
   db:
     image: postgres
     healthcheck:
@@ -17,19 +14,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 100
-
     volumes:
       - db:/var/lib/postgresql/data
 
-# REDIS in memory database
-  redis:
-    image: redis:3
-    command: redis-server
-    volumes:
-      - redis:/data
-#    ports:
-#      - 6379:6379
-#
 # SOLR indexing
   solr:
     image: solr
@@ -42,33 +29,27 @@ services:
       - hydra-production
       - /config
 
-    ports:
-      - 8983:8983
-
 # Fedora object store
   fedora:
     image: ualibraries/fedora
     volumes:
       - fedora:/fedora
-#    ports:
-#      - 8080:8080
 
-# This image actually runs hyku app
-  web:
+  setup:
     image: ualibraries/hyku_app
-    command: /usr/local/bin/start_hyku.sh
     env_file: .env
     environment:
-      - REDIS_HOST=redis
-      - SETTINGS__ACTIVE_JOB__QUEUE_ADAPTER=sidekiq
+      - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
       - FEDORA_URL=http://fedora:8080/fcrepo/rest
       - SOLR_URL=http://solr:8983/solr/hydra-production
-      - RAILS_SERVE_STATIC_FILES=true
-      - RAILS_LOG_TO_STDOUT=true
+    volumes:
+    command: /bin/bash -c "if [ ! -e /db/initialized ]; then sleep 25 && /data/bin/setup && touch /db/initialized; fi"
+    volumes:
+      - db:/db
     depends_on:
       db:
-        condition: service_healthy
-    ports:
-      - ${HOSTPORT}:9292
-    volumes:
-      - app:/data/public/uploads
+          condition: service_healthy
+    depends_on:
+      - fedora
+      - solr
+
